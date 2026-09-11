@@ -29,11 +29,11 @@ resource "aws_rds_cluster" "postgres" {
 }
 
 resource "aws_rds_cluster_instance" "postgres" {
-  count              = 3
-  identifier         = "${var.project_name}-${var.environment}-postgres-${count.index + 1}"
-  cluster_identifier = aws_rds_cluster.postgres.id
-  instance_class     = "db.t3.medium"
-  engine             = aws_rds_cluster.postgres.engine
+  count               = 3
+  identifier          = "${var.project_name}-${var.environment}-postgres-${count.index + 1}"
+  cluster_identifier  = aws_rds_cluster.postgres.id
+  instance_class      = "db.t3.medium"
+  engine              = aws_rds_cluster.postgres.engine
   publicly_accessible = false
 }
 
