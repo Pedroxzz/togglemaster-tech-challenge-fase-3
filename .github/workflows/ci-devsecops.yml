@@ -31,6 +31,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          if [ ! -d "${{ matrix.service }}" ]; then
+            echo "Pasta '${{ matrix.service }}' não existe neste repositório. Pulando etapa de build para este serviço."
+            exit 0
+          fi
+
           if [ "${{ matrix.service }}" = "auth-service" ] || [ "${{ matrix.service }}" = "evaluation-service" ]; then
             cd ${{ matrix.service }} && go mod download && go test ./...
           else
