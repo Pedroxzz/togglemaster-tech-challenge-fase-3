@@ -74,7 +74,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
 
       - name: Login to ECR
         id: login-ecr
@@ -94,3 +94,17 @@ jobs:
           for svc in auth-service flag-service targeting-service evaluation-service analytics-service; do
             trivy image --severity CRITICAL,HIGH --exit-code 1 ${{ steps.login-ecr.outputs.registry }}/$svc:$IMAGE_TAG
           done
+
+      - name: Update GitOps image tags
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          python - <<'PY'
+          from pathlib import Path
+          image_tag = "${{ github.sha }}"
+          base = Path('gitops/apps')
+          for file in base.glob('*.yaml'):
+              text = file.read_text()
+              text = text.replace('newTag: latest', f'newTag: {image_tag}')
+              file.write_text(text)
+          print(f'GitOps tags updated to {image_tag}')
+          PY
